@@ -239,10 +239,11 @@ func (m *Manager) messageWorker() {
 			}
 
 			// Pause on hitting the message rate.
-			if numMsg >= m.cfg.MessageRate {
-				time.Sleep(time.Second)
+			//if numMsg >= m.cfg.MessageRate {
+        m.logger.Printf("Sleeping 25 seconds..")
+				time.Sleep(25 * time.Second)
 				numMsg = 0
-			}
+			//}
 			numMsg++
 
 			// Outgoing message.
@@ -264,9 +265,11 @@ func (m *Manager) messageWorker() {
 				out.Headers = h
 			}
 
+      m.logger.Printf("sending message to %s", msg.Subscriber.Email)
+
 			if err := m.messengers[msg.Campaign.Messenger].Push(out); err != nil {
-				m.logger.Printf("error sending message in campaign %s: subscriber %s: %v",
-					msg.Campaign.Name, msg.Subscriber.UUID, err)
+				m.logger.Printf("error sending message in campaign %s: subscriber %s / %s: %v",
+					msg.Campaign.Name, msg.Subscriber.UUID, msg.Subscriber.Email, err)
 
 				select {
 				case m.campMsgErrorQueue <- msgError{camp: msg.Campaign, err: err}:
